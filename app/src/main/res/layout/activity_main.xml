@@ -17,7 +17,8 @@
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
                 android:text="NutriScan"
-                android:textSize="26dp"
+                android:textSize="34dp"
+                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -29,7 +30,7 @@
     <View
             android:id="@+id/border"
             android:layout_width="match_parent"
-            android:layout_height="2px"
+            android:layout_height="4px"
             android:layout_below="@id/toolbar"
             android:background="#7E7E7E"/>
 

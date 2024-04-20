@@ -1,22 +1,11 @@
-<!-- fragment_example.xml -->
+<androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-
-    <ProgressBar
-            style="?android:attr/progressBarStyle"
-            android:layout_width="178dp"
-            android:layout_height="188dp"
-            android:progressTint="@android:color/darker_gray"
-            android:id="@+id/progressBar"
-            android:layout_centerInParent="true"/>
-
-    <com.journeyapps.barcodescanner.DecoratedBarcodeView
-            android:id="@+id/barcode_scanner"
+    <androidx.camera.view.PreviewView
+            android:id="@+id/previewView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentTop="true">
-    </com.journeyapps.barcodescanner.DecoratedBarcodeView>
-</RelativeLayout>
+            android:layout_height="match_parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

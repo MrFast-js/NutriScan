@@ -1,32 +1,13 @@
 package com.example.nutritionalbarcodescanner
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import android.widget.LinearLayout
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import com.example.nutritionalbarcodescanner.menuPages.*
 import org.json.JSONObject
 
-class MainActivity : AppCompatActivity() {
-
-    private val productInfoReturnListener =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val returnedData = result.data?.getStringExtra("product_info")
-
-                val frag = ProductInfoFragment()
-                val bundle = Bundle()
-                bundle.putString("product_info", returnedData)
-                println("BUNDLING DATA: $returnedData")
-                frag.arguments = bundle
-
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container, frag)
-                    .commit()
-            }
-        }
+class MainActivity : AppCompatActivity(), ScanFragment.FragmentInteractionListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,60 +15,103 @@ class MainActivity : AppCompatActivity() {
 
         // Auto Load Home
         if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, HomeFragment())
-                .commit()
+            setFrag(HomeFragment())
         }
 
         setupFragmentButtonUse()
 
         val scanButton: LinearLayout = findViewById(R.id.scanButton)
         scanButton.setOnClickListener {
-            val intent = Intent(this, BarcodeScannerActivity::class.java)
-            productInfoReturnListener.launch(intent)
+            setFrag(ScanFragment())
         }
     }
 
     fun setupFragmentButtonUse() {
         val homeButton: LinearLayout = findViewById(R.id.homeButton)
         homeButton.setOnClickListener {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, HomeFragment())
-                .commit()
+            setFrag(HomeFragment())
         }
 
         val exploreButton: LinearLayout = findViewById(R.id.exploreButton)
         exploreButton.setOnClickListener {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, ExploreFragment())
-                .commit()
+            setFrag(ExploreFragment())
         }
-
-//        val scanButton: LinearLayout = findViewById(R.id.scanButton)
-//        homeButton.setOnClickListener {
-//            supportFragmentManager.beginTransaction()
-//                .replace(R.id.fragment_container, HomeFragment())
-//                .commit()
-//        }
 
         val friendsButton: LinearLayout = findViewById(R.id.friendsButton)
         friendsButton.setOnClickListener {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, FriendsFragment())
-                .commit()
+            setFrag(FriendsFragment())
         }
 
         val profileButton: LinearLayout = findViewById(R.id.profileButton)
         profileButton.setOnClickListener {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, ProfileFragment())
-                .commit()
+            setFrag(ProfileFragment())
         }
     }
 
+    override fun onBackPressed() {
+        val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
+
+        setFrag(HomeFragment())
+    }
+
+    private var previousFragment: Fragment? = null
+
+    fun setFrag(frag: Fragment) {
+        if (frag.javaClass.name == previousFragment?.javaClass?.name) return
+        val transaction = supportFragmentManager.beginTransaction()
+
+        // Determine the appropriate animation based on the transition direction
+        if (previousFragment != null) {
+            val currentIndex = getFragmentIndex(frag)
+            val previousIndex = getFragmentIndex(previousFragment!!)
+            val animations = if (currentIndex > previousIndex) {
+                // Going forward in the fragment array
+                Pair(R.anim.slide_in_right, R.anim.slide_out_left)
+            } else {
+                // Going backward in the fragment array
+                Pair(R.anim.slide_in_left, R.anim.slide_out_right)
+            }
+            transaction.setCustomAnimations(animations.first, animations.second)
+        }
+
+        transaction.replace(R.id.fragment_container, frag)
+        transaction.commit()
+
+        // Update the previous fragment
+        previousFragment = frag
+    }
+
+    private fun getFragmentIndex(fragment: Fragment): Int {
+        // Define the order of fragment class types
+        val order = listOf(
+            HomeFragment::class.java,
+            ExploreFragment::class.java,
+            ProductInfoFragment::class.java,
+            FriendsFragment::class.java,
+            ProfileFragment::class.java
+        )
+
+        // Find the index of the fragment class type in the order list
+        for ((index, fragmentClass) in order.withIndex()) {
+            if (fragmentClass.isInstance(fragment)) {
+                return index
+            }
+        }
+
+        // Return -1 if the fragment class type is not found in the order list
+        return -1
+    }
+
+
     companion object {
         var productInfo: JSONObject? = JSONObject()
+    }
 
-
+    override fun openProductInfoFragment(productinfo: JSONObject) {
+        val frag = ProductInfoFragment()
+        val bundle = Bundle()
+        bundle.putString("product_info", productinfo.toString())
+        frag.arguments = bundle
+        setFrag(frag)
     }
 }

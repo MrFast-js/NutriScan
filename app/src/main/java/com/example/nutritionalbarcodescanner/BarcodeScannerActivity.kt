@@ -5,14 +5,9 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.nutritionalbarcodescanner.MainActivity.Companion.productInfo
-import com.example.nutritionalbarcodescanner.menuPages.HomeFragment
-import com.example.nutritionalbarcodescanner.menuPages.ProductInfoFragment
 import com.google.zxing.integration.android.IntentIntegrator
 import com.journeyapps.barcodescanner.DecoratedBarcodeView
 import okhttp3.*
@@ -108,7 +103,6 @@ class BarcodeScannerActivity : AppCompatActivity() {
         println(
             "SENDING REQ TO: \"https://world.openfoodfacts.org/api/v0/product/$productId.json\""
         )
-
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
