@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="mainAppColor">#33B36E</color>
+    <color name="topToolBarColor">#FFFFFF</color>
+
+
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="green">#56BD15</color>
+    <color name="red">#D80000</color>
+
+    <color name="warningTitleColor">#FFFFFF</color>
+    <color name="warningDescriptionColor">#cccccc</color>
+
+    <color name="button_color">#94FF6D</color>
+</resources>

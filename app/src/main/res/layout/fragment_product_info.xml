@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                <FrameLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center">
+
+                    <com.example.nutritionalbarcodescanner.CircularProgressBar
+                            android:id="@+id/circularProgressBar"
+                            android:layout_width="300dp"
+                            android:layout_height="300dp"
+                            android:layout_gravity="center"/>
+
+                    <TextView
+                            android:id="@+id/scoreTextView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="100sp"
+                            android:textStyle="bold"
+                            android:text="69"
+                            android:layout_gravity="center"/>
+
+                </FrameLayout>
+
+            </LinearLayout>
+
+            <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardElevation="4dp"
+                    app:cardCornerRadius="8dp"
+                    android:padding="16dp"
+                    app:cardUseCompatPadding="true"
+                    android:layout_marginTop="-20dp">
+
+                <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="16dp">
+
+                    <ImageView
+                            android:id="@+id/imageView"
+                            android:layout_width="80dp"
+                            android:layout_height="80dp"
+                            android:scaleType="fitStart"
+                            tools:srcCompat="@tools:sample/avatars"
+                            android:layout_marginEnd="16dp"
+                            android:layout_gravity="start"
+                    />
+
+                    <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_gravity="center_vertical"> <!-- Center the LinearLayout vertically -->
+
+                        <TextView
+                                android:id="@+id/textView"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Macaroni And Cheese"
+                                android:maxLines="2"
+                                android:textSize="20sp"/>
+
+                        <TextView
+                                android:id="@+id/productDescriptionTextView"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text=""
+                                android:textSize="14sp"
+                                android:layout_marginTop="4dp"/>
+                    </LinearLayout>
+
+                </LinearLayout>
+
+
+            </androidx.cardview.widget.CardView>
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="5dp"
+                    android:layout_marginTop="1dp">
+
+                <LinearLayout
+                        android:id="@+id/warningContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                </LinearLayout>
+
+                <!-- Nutrition Stat -->
+                <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:cardElevation="4dp"
+                        app:cardCornerRadius="8dp"
+                        android:padding="0dp"
+                        android:layout_marginBottom="16dp"
+                        app:cardUseCompatPadding="true">
+
+                    <LinearLayout
+                            android:id="@+id/parentLayout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="8dp"
+                            android:orientation="vertical">
+
+                        <!-- Your content here -->
+                        <!-- Add more views dynamically if needed -->
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</RelativeLayout>
