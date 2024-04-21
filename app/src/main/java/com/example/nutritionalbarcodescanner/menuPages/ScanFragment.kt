@@ -1,13 +1,11 @@
 package com.example.nutritionalbarcodescanner.menuPages
 
 import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -16,7 +14,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.nutritionalbarcodescanner.BarcodeScannerActivity
 import com.example.nutritionalbarcodescanner.R
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.barcode.BarcodeScanning
@@ -32,7 +29,6 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class ScanFragment : Fragment() {
-
     interface FragmentInteractionListener {
         fun openProductInfoFragment(productId: JSONObject) {
 
@@ -43,22 +39,22 @@ class ScanFragment : Fragment() {
     private lateinit var barcodeScanner: BarcodeScanner
     private lateinit var previewView: PreviewView
     private lateinit var listener: FragmentInteractionListener
-
+    private lateinit var viewReference: View
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         if (requireActivity().checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             requireActivity().requestPermissions(
                 arrayOf(Manifest.permission.CAMERA),
                 1001
             )
         }
-        val view = inflater.inflate(R.layout.fragment_scan, container, false)
-        previewView = view.findViewById(R.id.previewView)
+        viewReference = inflater.inflate(R.layout.fragment_scan, container, false)
+        previewView = viewReference.findViewById(R.id.previewView)
         listener = activity as FragmentInteractionListener
-        return view
+        return viewReference
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -102,9 +98,7 @@ class ScanFragment : Fragment() {
     private class BarcodeAnalyzer(
         private val listener: FragmentInteractionListener,
         context: FragmentActivity
-    ) :
-        ImageAnalysis.Analyzer,
-        Fragment() {
+    ) : ImageAnalysis.Analyzer, Fragment() {
         var lastScannedBarcode = ""
 
         private val scanner: BarcodeScanner = BarcodeScanning.getClient()

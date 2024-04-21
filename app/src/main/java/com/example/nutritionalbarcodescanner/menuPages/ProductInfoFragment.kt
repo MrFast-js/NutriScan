@@ -5,18 +5,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
-import com.example.nutritionalbarcodescanner.R
-import kotlinx.coroutines.withContext
-import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.example.nutritionalbarcodescanner.CircularProgressBar
+import com.example.nutritionalbarcodescanner.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
@@ -126,13 +126,16 @@ class ProductInfoFragment : Fragment() {
     private fun setProductImage(json: JSONObject) {
         var imageUrl =
             "https://storage.googleapis.com/spoonful_product_images_compressed/${json.getString("_id")}-300x300.webp"
+        val recentScannedProducts = requireActivity().getSharedPreferences("recentScannedProducts", AppCompatActivity.MODE_PRIVATE)
 
         // Start the coroutine
         CoroutineScope(Dispatchers.Main).launch {
             if (!isImageUrlExists(imageUrl)) {
                 imageUrl = json.getString("image_url")
             }
-
+            val editor = recentScannedProducts.edit()
+            editor.putString(json.getString("product_name"), imageUrl)
+            editor.apply()
             // Load the image using Glide after checking image URL existence
             view?.findViewById<ImageView>(R.id.imageView).apply {
                 this?.let { Glide.with(this@ProductInfoFragment).load(imageUrl).into(it) }
