@@ -48,22 +48,27 @@ class MainActivity : AppCompatActivity(), ScanFragment.FragmentInteractionListen
         }
     }
 
+    private var lastFrag: Fragment? = null
     override fun onBackPressed() {
         val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
-
+        if (currentFragment is ProductInfoFragment && lastFrag !is HomeFragment) {
+            setFrag(ScanFragment())
+            return
+        }
         setFrag(HomeFragment())
     }
 
-    private var previousFragment: Fragment? = null
-
+    private var currentFrag: Fragment? = null
     fun setFrag(frag: Fragment) {
-        if (frag.javaClass.name == previousFragment?.javaClass?.name) return
+        if (frag.javaClass.name == currentFrag?.javaClass?.name) return
+        lastFrag = supportFragmentManager.findFragmentById(R.id.fragment_container)
+
         val transaction = supportFragmentManager.beginTransaction()
 
         // Determine the appropriate animation based on the transition direction
-        if (previousFragment != null) {
+        if (currentFrag != null) {
             val currentIndex = getFragmentIndex(frag)
-            val previousIndex = getFragmentIndex(previousFragment!!)
+            val previousIndex = getFragmentIndex(currentFrag!!)
             val animations = if (currentIndex > previousIndex) {
                 // Going forward in the fragment array
                 Pair(R.anim.slide_in_right, R.anim.slide_out_left)
@@ -76,9 +81,8 @@ class MainActivity : AppCompatActivity(), ScanFragment.FragmentInteractionListen
 
         transaction.replace(R.id.fragment_container, frag)
         transaction.commit()
-
         // Update the previous fragment
-        previousFragment = frag
+        currentFrag = frag
     }
 
     private fun getFragmentIndex(fragment: Fragment): Int {
@@ -86,6 +90,7 @@ class MainActivity : AppCompatActivity(), ScanFragment.FragmentInteractionListen
         val order = listOf(
             HomeFragment::class.java,
             ExploreFragment::class.java,
+            ScanFragment::class.java,
             ProductInfoFragment::class.java,
             FriendsFragment::class.java,
             ProfileFragment::class.java
@@ -100,11 +105,6 @@ class MainActivity : AppCompatActivity(), ScanFragment.FragmentInteractionListen
 
         // Return -1 if the fragment class type is not found in the order list
         return -1
-    }
-
-
-    companion object {
-        var productInfo: JSONObject? = JSONObject()
     }
 
     override fun openProductInfoFragment(productinfo: JSONObject) {
