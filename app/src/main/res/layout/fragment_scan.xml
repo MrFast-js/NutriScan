@@ -1,4 +1,4 @@
-<androidx.constraintlayout.widget.ConstraintLayout
+<RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -6,6 +6,12 @@
     <androidx.camera.view.PreviewView
             android:id="@+id/previewView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <ImageView
+            android:id="@+id/barcodeOverlay"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:src="@drawable/barcode_overlay_svg"
+            android:layout_centerInParent="true"/>
+</RelativeLayout>
