@@ -19,33 +19,44 @@ class HomeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val recentScannedProducts = requireActivity().getSharedPreferences("recentScannedProducts", AppCompatActivity.MODE_PRIVATE)
+        val recentScannedProducts =
+            requireActivity().getSharedPreferences("recentScannedProducts", AppCompatActivity.MODE_PRIVATE)
         val productCache = requireActivity().getSharedPreferences("ProductIdFetchCache", AppCompatActivity.MODE_PRIVATE)
 
         // Inflate the layout for this fragment
         val rootView = inflater.inflate(R.layout.fragment_home, container, false)
-        for (recentProduct in recentScannedProducts.all) {
-            for (product in productCache.all) {
-                if(product.value.toString().contains(recentProduct.key)) {
-                    // Inflate the new CardView layout
-                    val newCardViewLayout = inflater.inflate(R.layout.recent_scan_entry_layout, null, false)
+        val sorted = recentScannedProducts.all.entries.toList()
+        sorted.sortedBy {
+            val matches = productCache.all.toMap().filter { it2 -> it2.value.toString().contains(it.key) }
 
-                    // Find ImageView in the new CardView layout
-                    val recentScanProductImage = newCardViewLayout.findViewById<ImageView>(R.id.productImage)
+            val product = matches.values.first()
+            JSONObject(product as String).getLong("scanned_at")
+        }
 
-                    // Load image into ImageView using Glide
-                    Glide.with(this@HomeFragment).load(recentProduct.value).into(recentScanProductImage)
+        for (recentProduct in sorted) {
+            val matches = productCache.all.toMap().filter { it.value.toString().contains(recentProduct.key) }
 
-                    // Find the LinearLayout to add the new CardView
-                    val recentScansContainer = rootView.findViewById<LinearLayout>(R.id.recentScansContainer)
+            if (matches.isNotEmpty()) {
+                val product = matches.values.first()
+                // Inflate the new CardView layout
+                val newCardViewLayout = inflater.inflate(R.layout.recent_scan_entry_layout, null, false)
 
-                    newCardViewLayout.setOnClickListener {
-                        (requireActivity() as MainActivity).openProductInfoFragment(JSONObject(product.value as String))
-                    }
+                // Find ImageView in the new CardView layout
+                val recentScanProductImage = newCardViewLayout.findViewById<ImageView>(R.id.productImage)
 
-                    // Add the new CardView to the LinearLayout
-                    recentScansContainer.addView(newCardViewLayout)
+                // Load image into ImageView using Glide
+                Glide.with(this@HomeFragment).load(recentProduct.value).into(recentScanProductImage)
+
+                // Find the LinearLayout to add the new CardView
+                val recentScansContainer = rootView.findViewById<LinearLayout>(R.id.recentScansContainer)
+
+                newCardViewLayout.setOnClickListener {
+                    (requireActivity() as MainActivity).openProductInfoFragment(JSONObject(product as String))
                 }
+
+                // Add the new CardView to the LinearLayout
+                recentScansContainer.addView(newCardViewLayout)
+                break
             }
         }
 

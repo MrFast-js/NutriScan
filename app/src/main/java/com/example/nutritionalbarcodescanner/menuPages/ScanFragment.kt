@@ -2,10 +2,12 @@ package com.example.nutritionalbarcodescanner.menuPages
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -18,9 +20,7 @@ import com.example.nutritionalbarcodescanner.R
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
@@ -103,6 +103,7 @@ class ScanFragment : Fragment() {
 
         private val scanner: BarcodeScanner = BarcodeScanning.getClient()
 
+        @RequiresApi(Build.VERSION_CODES.S)
         @ExperimentalGetImage
         override fun analyze(imageProxy: ImageProxy) {
             val mediaImage = imageProxy.image
@@ -141,9 +142,7 @@ class ScanFragment : Fragment() {
                         imageProxy.close()
                     }
                     .addOnCompleteListener {
-                        // This will be called after all frames are processed
-                        // You can add any cleanup code here
-                        // For example, if you have UI updates, make sure they're done here
+
                     }
             }
         }
@@ -156,33 +155,54 @@ class ScanFragment : Fragment() {
             }
 
             return withContext(Dispatchers.IO) {
-                // Your existing fetchProductInfo function implementation
-                val client = OkHttpClient()
-                val request = Request.Builder()
-                    .url("https://world.openfoodfacts.org/api/v0/product/$productId.json")
-                    .build()
+                try {
+                    // Coroutine with a timeout of 10 seconds
+                    withTimeout(10_000) {
+                        // Your existing fetchProductInfo function implementation
+                        val client = OkHttpClient()
+                        val request = Request.Builder()
+                            .url("https://world.openfoodfacts.org/api/v0/product/$productId.json")
+                            .build()
 
-                println("SENDING REQUEST TO ${request.url}")
+                        println("SENDING REQUEST TO ${request.url}")
 
-                val response = client.newCall(request).execute()
-                val body = response.body?.string()
+                        val response = client.newCall(request).execute()
+                        val body = response.body?.string()
 
-                if (response.isSuccessful) {
-                    val jsonObject = JSONObject(body)
+                        if (response.isSuccessful) {
+                            val jsonObject = JSONObject(body)
 
-                    if (jsonObject.getInt("status") == 1) {
-                        // Cache the product info
-                        val editor = sharedPreferences.edit()
-                        editor.putString(productId, jsonObject.getJSONObject("product").toString())
-                        editor.apply()
+                            if (jsonObject.getInt("status") == 1) {
+                                // Cache the product info
+                                val editor = sharedPreferences.edit()
+                                val bigJson = jsonObject.getJSONObject("product")
+                                val filteredJson = JSONObject()
+                                filteredJson.put("_id",bigJson.getString("_id"))
+                                filteredJson.put("_keywords",bigJson.getJSONArray("_keywords"))
+                                filteredJson.put("image_url",bigJson.getString("image_url"))
+                                filteredJson.put("nova_groups_tags",bigJson.getJSONArray("nova_groups_tags"))
+                                filteredJson.put("nutriments",bigJson.getJSONObject("nutriments"))
+                                filteredJson.put("categories_hierarchy",bigJson.getJSONArray("categories_hierarchy"))
+                                filteredJson.put("nutriscore_score",bigJson.getInt("nutriscore_score"))
+                                filteredJson.put("allergens_tags",bigJson.getJSONArray("allergens_tags"))
+                                filteredJson.put("product_name",bigJson.getString("product_name"))
+                                filteredJson.put("ingredients",bigJson.getJSONArray("ingredients"))
+                                filteredJson.put("additives_n",bigJson.getDouble("additives_n"))
+                                filteredJson.put("scanned_at",System.currentTimeMillis())
+                                editor.putString(productId, filteredJson.toString())
+                                editor.apply()
 
-                        // Parse and return product info
-                        return@withContext jsonObject.getJSONObject("product").toString()
-                    } else {
-                        throw IOException("Could not find food product")
+                                // Parse and return product info
+                                jsonObject.getJSONObject("product").toString()
+                            } else {
+                                throw IOException("Could not find food product")
+                            }
+                        } else {
+                            throw IOException("Error processing product information")
+                        }
                     }
-                } else {
-                    throw IOException("Error processing product information")
+                } catch (e: TimeoutCancellationException) {
+                    throw IOException("Timeout: Unable to fetch product information within 10 seconds")
                 }
             }
         }
